@@ -1,18 +1,24 @@
-# User Registration Endpoint Documentation
+# Backend API Documentation
 
-## `/users/register`
+## `/users/register` Endpoint
 
 ### Description
 
-This endpoint allows a new user to register. It requires the user's first name, email, and password. The full name object must include at least a valid `firstname` (minimum 3 characters). The password must be at least 6 characters long. Optionally, the full name can include a `lastname`.
+Registers a new user by creating a user account with the provided information.
 
-### Request Data
+### HTTP Method
 
-- **fullname** (object)
-  - **firstname** (string, required): Minimum 3 characters.
-  - **lastname** (string, optional): Minimum 3 characters if provided.
-- **email** (string, required): A valid email address.
-- **password** (string, required): Minimum 6 characters.
+`POST`
+
+### Request Body
+
+The request body should be in JSON format and include the following fields:
+
+- **fullname** (object):
+  - **firstname** (string, required): User's first name (minimum 3 characters).
+  - **lastname** (string, optional): User's last name (minimum 3 characters).
+- **email** (string, required): User's email address (must be a valid email).
+- **password** (string, required): User's password (minimum 6 characters).
 
 #### Example Request Body
 
@@ -27,11 +33,9 @@ This endpoint allows a new user to register. It requires the user's first name, 
 }
 ```
 
-### Response Status Codes
+### Example Response
 
-- **201 Created**  
-  The user is successfully registered.  
-  **Response Body:**
+- **201 Created**
 
   ```json
   {
@@ -48,52 +52,84 @@ This endpoint allows a new user to register. It requires the user's first name, 
   ```
 
 - **400 Bad Request**
+  - Validation errors or if a user with the provided email already exists.
+  ```json
+  {
+    "errors": [
+      { "msg": "Error message here", "param": "field", "location": "body" }
+    ]
+  }
+  ```
 
-  - **Validation Error:** If any required fields are missing or do not meet the criteria.  
-    **Response Body:**
-    ```json
-    {
-      "errors": [
-        { "msg": "Error message here", "param": "field", "location": "body" }
-      ]
-    }
-    ```
-  - **User Already Exists:** If a user with the provided email already exists.  
-    **Response Body:**
-    ```json
-    {
-      "message": "User already exist"
-    }
-    ```
+## `/users/login` Endpoint
 
-- **500 Internal Server Error**  
-  If an unexpected error occurs during registration.
+### Description
+
+Authenticates an existing user by validating the provided email and password, and returns a JWT token if successful.
+
+### HTTP Method
+
+`POST`
+
+### Request Body
+
+The request body should be in JSON format and include the following fields:
+
+- **email** (string, required): User's email address (must be a valid email).
+- **password** (string, required): User's password (minimum 6 characters).
+
+#### Example Request Body
+
+```json
+{
+  "email": "john.doe@example.com",
+  "password": "secret123"
+}
+```
+
+### Example Response
+
+- **200 OK**
+
+  ```json
+  {
+    "token": "JWT_TOKEN_HERE",
+    "user": {
+      "_id": "USER_ID",
+      "fullname": {
+        "firstname": "John",
+        "lastname": "Doe"
+      },
+      "email": "john.doe@example.com"
+    }
+  }
+  ```
+
+  Additionally, the JWT token is set as an HTTP-only cookie (`token`).
+
+- **400 Bad Request**
+
+  - Validation errors if the input does not meet the required criteria.
+
+  ```json
+  {
+    "errors": [
+      { "msg": "Error message here", "param": "field", "location": "body" }
+    ]
+  }
+  ```
+
+- **401 Unauthorized**
+  - If the email or password is incorrect.
+  ```json
+  {
+    "message": "Invalid email or password"
+  }
+  ```
 
 ---
 
-For more details on the implementation, refer to the [user.controller.js](Backend/controllers/user.controller.js) and [user.routes.js](Backend/routes/user.routes.js) files.
+For more details on the implementation, please refer to:
 
-### POST Method at Port 4000
-
-The `/users/register` endpoint is accessible via a POST request to the server running on port `4000`. Ensure the server is properly configured to listen on this port.
-
-#### Example Request
-
-```bash
-curl -X POST http://localhost:4000/users/register \
--H "Content-Type: application/json" \
--d '{
-  "fullname": {
-    "firstname": "John",
-    "lastname": "Doe"
-  },
-  "email": "john.doe@example.com",
-  "password": "secret123"
-}'
-```
-
-#### Expected Response
-
-- **201 Created**: User successfully registered.
-- **400 Bad Request**: Validation error or user already exists.
-- **500 Internal Server Error**: Unexpected server error.
+- [user.controller.js](Backend/controllers/user.controller.js)
+- [user.routes.js](Backend/routes/user.routes.js)
