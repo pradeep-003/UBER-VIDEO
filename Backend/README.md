@@ -169,7 +169,7 @@ For more details on the implementation, please refer to:
 
 ### Description
 
-Registers a new captain by creating a captain account with the provided information. In addition to the basic credentials, the captain must provide vehicle details.
+Registers a new captain account along with associated vehicle details. All fields are required and must meet the specified constraints.
 
 ### HTTP Method
 
@@ -177,90 +177,176 @@ Registers a new captain by creating a captain account with the provided informat
 
 ### Request Body
 
-The request body must be in JSON format and include the following fields:
-
-- **fullname** (object):
-  - **firstname** (string, required): Captain's first name (minimum 3 characters).
-  - **lastname** (string, optional): Captain's last name (minimum 3 characters if provided).
-- **email** (string, required): Captain's email address (must be a valid email).
-- **password** (string, required): Captain's password (minimum 6 characters).
-- **vehicle** (object, required): Vehicle details including:
-  - **color** (string, required): Vehicle color (minimum 3 characters).
-  - **plate** (string, required): Vehicle plate number (minimum 3 characters).
-  - **capacity** (number, required): Seating capacity.
-  - **vehicleType** (string, required): Must be one of the following values: `car`, `motorcycle`, or `auto`.
-
-#### Example Request Body
-
 ```json
 {
   "fullname": {
-    "firstname": "Jane",
-    "lastname": "Doe"
+    "firstname": "Jane", // Required, minimum 3 characters
+    "lastname": "Doe" // Optional, minimum 3 characters if provided
   },
-  "email": "jane.doe@example.com",
-  "password": "secret123",
+  "email": "jane.doe@example.com", // Required, valid email format
+  "password": "secret123", // Required, minimum 6 characters
   "vehicle": {
-    "color": "Red",
-    "plate": "ABC123",
-    "capacity": 4,
-    "vehicleType": "car"
+    "color": "Red", // Required, minimum 3 characters
+    "plate": "ABC123", // Required, minimum 3 characters
+    "capacity": 4, // Required, numerical value representing seating capacity
+    "vehicleType": "car" // Required, must be one of: "car", "motorcycle", "auto"
   }
 }
 ```
 
 ### Example Response
 
-- **201 Created**
+**201 Created**
 
-  On successful registration, the endpoint will return the newly created captain's details along with an authorization token. (Example response format)
-
-  ```json
-  {
-    "token": "JWT_TOKEN_HERE",
-    "captain": {
-      "_id": "CAPTAIN_ID",
-      "fullname": {
-        "firstname": "Jane",
-        "lastname": "Doe"
-      },
-      "email": "jane.doe@example.com",
-      "vehicle": {
-        "color": "Red",
-        "plate": "ABC123",
-        "capacity": 4,
-        "vehicleType": "car"
-      }
+```json
+{
+  "token": "JWT_TOKEN_HERE", // JWT authentication token
+  "captain": {
+    "_id": "CAPTAIN_ID", // Unique identifier of the captain
+    "fullname": {
+      "firstname": "Jane",
+      "lastname": "Doe"
+    },
+    "email": "jane.doe@example.com",
+    "vehicle": {
+      "color": "Red",
+      "plate": "ABC123",
+      "capacity": 4,
+      "vehicleType": "car"
     }
   }
-  ```
+}
+```
 
-- **400 Bad Request**
+---
 
-  The endpoint returns a 400 status code if:
+## `/captain/login` Endpoint
 
-  - Required fields are missing
-  - One or more fields do not meet the validation criteria
+### Description
 
-  Example error response:
+Authenticates an existing captain using email and password.
 
+### HTTP Method
+
+`POST`
+
+### Request Body
+
+```json
+{
+  "email": "jane.doe@example.com", // Required, valid email format
+  "password": "secret123" // Required, minimum 6 characters
+}
+```
+
+### Example Response
+
+**200 OK**
+
+```json
+{
+  "token": "JWT_TOKEN_HERE", // JWT authentication token (also set as an HTTP-only cookie)
+  "captain": {
+    "_id": "CAPTAIN_ID", // Unique identifier of the captain
+    "fullname": {
+      "firstname": "Jane",
+      "lastname": "Doe"
+    },
+    "email": "jane.doe@example.com",
+    "vehicle": {
+      "color": "Red",
+      "plate": "ABC123",
+      "capacity": 4,
+      "vehicleType": "car"
+    }
+  }
+}
+```
+
+**Error Responses**
+
+- **400 Bad Request** – For validation errors:
   ```json
   {
-    "errors": [
-      { "msg": "Invalid Email", "param": "email", "location": "body" },
-      {
-        "msg": "First name must be at least 3 characters long",
-        "param": "fullname.firstname",
-        "location": "body"
-      }
-    ]
+    "errors": [{ "msg": "Invalid Email", "param": "email", "location": "body" }]
+  }
+  ```
+- **401 Unauthorized** – For invalid credentials:
+  ```json
+  {
+    "message": "Invalid email or password"
   }
   ```
 
 ---
 
-For further details on the implementation, please refer to:
+## `/captain/profile` Endpoint
 
-- [captain.routes.js](UBER-VIDEO/Backend/routes/captain.routes.js)
-- [captain.controller.js](UBER-VIDEO/Backend/controllers/captain.controller.js)
-- [captain.service.js](UBER-VIDEO/Backend/services/captain.service.js)
+### Description
+
+Returns the profile information of the currently authenticated captain.
+
+### HTTP Method
+
+`GET`
+
+### Headers
+
+Requires an authentication token provided either in the `Authorization` header as a Bearer token or as a `token` cookie.
+
+### Example Response
+
+**200 OK**
+
+```json
+{
+  "captain": {
+    "_id": "CAPTAIN_ID", // Unique identifier
+    "fullname": {
+      "firstname": "Jane",
+      "lastname": "Doe"
+    },
+    "email": "jane.doe@example.com",
+    "vehicle": {
+      "color": "Red",
+      "plate": "ABC123",
+      "capacity": 4,
+      "vehicleType": "car"
+    }
+  }
+}
+```
+
+---
+
+## `/captain/logout` Endpoint
+
+### Description
+
+Logs out the currently authenticated captain by blacklisting the token, effectively invalidating it.
+
+### HTTP Method
+
+`GET`
+
+### Headers
+
+Requires an authentication token provided either in the `Authorization` header as a Bearer token or as a `token` cookie.
+
+### Example Response
+
+**200 OK**
+
+```json
+{
+  "message": "Logout successfully"
+}
+```
+
+---
+
+For further details on implementation, please refer to:
+
+- [captain.routes.js](Backend/routes/captain.routes.js)
+- [captain.controller.js](Backend/controllers/captain.controller.js)
+- [captain.service.js](Backend/services/captain.service.js)
