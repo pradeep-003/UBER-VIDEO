@@ -160,8 +160,8 @@ The token should be provided in:
 
 For more details on the implementation, please refer to:
 
-- [user.controller.js](Backend/controllers/user.controller.js)
-- [user.routes.js](Backend/routes/user.routes.js)
+- [user.controller.js](UBER-VIDEO/Backend/controllers/user.controller.js)
+- [user.routes.js](UBER-VIDEO/Backend/routes/user.routes.js)
 
 # Captain Routes Documentation
 
@@ -261,6 +261,6 @@ The request body must be in JSON format and include the following fields:
 
 For further details on the implementation, please refer to:
 
-- [captain.routes.js](Backend/routes/captain.routes.js)
-- [captain.controller.js](Backend/controllers/captain.controller.js)
-- [captain.service.js](Backend/services/captain.service.js)
+- [captain.routes.js](UBER-VIDEO/Backend/routes/captain.routes.js)
+- [captain.controller.js](UBER-VIDEO/Backend/controllers/captain.controller.js)
+- [captain.service.js](UBER-VIDEO/Backend/services/captain.service.js)
