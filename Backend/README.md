@@ -165,7 +165,7 @@ For more details on the implementation, please refer to:
 
 # Captain Routes Documentation
 
-## `/captain/register` Endpoint
+## `/captains/register` Endpoint
 
 ### Description
 
