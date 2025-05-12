@@ -120,12 +120,41 @@ The request body should be in JSON format and include the following fields:
   ```
 
 - **401 Unauthorized**
+
   - If the email or password is incorrect.
+
   ```json
   {
     "message": "Invalid email or password"
   }
   ```
+
+  # 🚪 Logout Endpoint
+
+## Endpoint
+
+`GET /users/logout`
+
+## Description
+
+Logs out the currently authenticated user by blacklisting the provided token. The token can be passed either in the request headers or via cookies. This action invalidates the token, preventing further use for authentication.
+
+## Authentication
+
+✅ **Required**
+
+The token should be provided in:
+
+- `Authorization` header as a Bearer token, or
+- `token` cookie
+
+## Request
+
+### Method
+
+`GET`
+
+### Headers (if using header authentication)
 
 ---
 
